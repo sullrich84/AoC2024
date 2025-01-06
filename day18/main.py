@@ -11,8 +11,6 @@ def solve(data, kb):
     grid_size = max([r for r, _ in data] + [c for _, c in data])
     grid = data[:kb]
 
-    print(grid_size, kb)
-
     # row, col, steps
     stack = deque([(0, 0, 0)])
     seen = []
