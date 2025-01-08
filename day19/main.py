@@ -8,47 +8,26 @@ def parseData(name="task"):
 
 def solve(data):
     pattern, towels = data
+    cache = {"": 1}
+    max_pattern_len = max(map(len, pattern))
 
-    def match(s1, s2):
-        if s1 == s2:
-            return True
+    def possible_designs(design):
+        if design in cache:
+            return cache[design]
 
-        if len(s1) <= len(s2):
-            return False
+        count = 0
+        oRange = min(len(design), max_pattern_len)
+        for i in range(oRange + 1):
+            snippet, remainder = design[:i], design[i:]
+            if snippet in pattern:
+                count += possible_designs(remainder)
 
-        for i, c in enumerate(list(s2)):
-            if c != s1[i]:
-                return False
+        cache[design] = count
+        return count
 
-        return True
-
-    def lookup(t):
-        stack = deque([])
-
-        # Fill stack with inital matches
-        for p in pattern:
-            if match(t, p):
-                stack.append(p)
-
-        # Find matching combination
-        while stack:
-            m = stack.pop()
-            for p in pattern:
-                if t == m + p:
-                    return True
-                if match(t, m + p):
-                    stack.append(m + p)
-
-        return False
-
-    designs = 0
-    for t in towels:
-        if lookup(t):
-            designs += 1
-
-    return designs
+    return [possible_designs(design) for design in towels]
 
 
 print("🎄 Day 19: Linen Layout")
-print("Part 1:", solve(parseData("task")))
-print(f"Part 2:", solve(parseData("task")))
+print("Part 1:", sum([bool(r) for r in solve(parseData("task"))]))
+print(f"Part 2:", sum(solve(parseData("task"))))
