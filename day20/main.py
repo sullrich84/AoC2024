@@ -6,7 +6,7 @@ def parseData(name="task"):
     return [list(line) for line in lines]
 
 
-def solve(grid):
+def solve(grid, part):
     rows, cols = len(grid), len(grid[0])
     r, c = 0, 0
 
@@ -37,6 +37,28 @@ def solve(grid):
     #     print(*row, sep="\t")
 
     cheats = 0
+    if part == 1:
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r][c] == "#":
+                    continue
+                for nr, nc in [
+                    # To avoid double checks, we only check
+                    # one half of all possible directions
+                    (r + 2, c),
+                    (r + 1, c + 1),
+                    (r, c + 2),
+                    (r - 1, c + 1),
+                ]:
+                    if nr not in range(rows) or nc not in range(cols):
+                        continue
+                    if grid[nr][nc] == "#":
+                        continue
+                    if abs(dists[r][c] - dists[nr][nc]) >= 102:
+                        cheats += 1
+        return cheats
+
+    cheats = 0
     for r in range(rows):
         for c in range(cols):
             if grid[r][c] == "#":
@@ -63,5 +85,5 @@ def solve(grid):
 
 
 print("🎄 Day 20: Race Condition")
-# print("Part 1:", solve(parseData("task")))
-print(f"Part 2:", solve(parseData("task")))
+print("Part 1:", solve(parseData("task"), 1))
+print(f"Part 2:", solve(parseData("task"), 2))
