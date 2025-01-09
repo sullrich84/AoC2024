@@ -1,6 +1,3 @@
-from collections import deque, defaultdict
-
-
 def parseData(name="task"):
     lines = open(f"{name}.txt").read().splitlines()
     return [list(line) for line in lines]
@@ -62,7 +59,7 @@ def solve(grid, part):
                 for radius in range(2, 21):
                     for dr in range(radius + 1):
                         dc = radius - dr
-                        for (nr, nc) in {
+                        for nr, nc in {
                             # To avoid double checks, we only check
                             # one half of all possible directions
                             (r + dr, c + dc),
