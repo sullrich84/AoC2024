@@ -33,10 +33,8 @@ def solve(grid, part):
             dists[nr][nc] = dists[r][c] + 1
             r, c = nr, nc
 
-    # for row in dists:
-    #     print(*row, sep="\t")
-
     cheats = 0
+
     if part == 1:
         for r in range(rows):
             for c in range(cols):
@@ -56,30 +54,28 @@ def solve(grid, part):
                         continue
                     if abs(dists[r][c] - dists[nr][nc]) >= 102:
                         cheats += 1
-        return cheats
-
-    cheats = 0
-    for r in range(rows):
-        for c in range(cols):
-            if grid[r][c] == "#":
-                continue
-            for radius in range(2, 21):
-                for dr in range(radius + 1):
-                    dc = radius - dr
-                    for nr, nc in [
-                        # To avoid double checks, we only check
-                        # one half of all possible directions
-                        (r + dr, c + dc),
-                        (r + dr, c - dc),
-                        (r - dr, c + dc),
-                        (r - dr, c - dc),
-                    ]:
-                        if nr not in range(rows) or nc not in range(cols):
-                            continue
-                        if grid[nr][nc] == "#":
-                            continue
-                        if dists[r][c] - dists[nr][nc] >= 100 + radius:
-                            cheats += 1
+    else:
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r][c] == "#":
+                    continue
+                for radius in range(2, 21):
+                    for dr in range(radius + 1):
+                        dc = radius - dr
+                        for (nr, nc) in {
+                            # To avoid double checks, we only check
+                            # one half of all possible directions
+                            (r + dr, c + dc),
+                            (r + dr, c - dc),
+                            (r - dr, c + dc),
+                            (r - dr, c - dc),
+                        }:
+                            if nr not in range(rows) or nc not in range(cols):
+                                continue
+                            if grid[nr][nc] == "#":
+                                continue
+                            if dists[r][c] - dists[nr][nc] >= 100 + radius:
+                                cheats += 1
 
     return cheats
 
