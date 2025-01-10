@@ -7,7 +7,7 @@ def parseData(name="task"):
     return [int(line) for line in lines]
 
 
-def solve(data):
+def solve2(data):
     def mix(x, y):
         return x ^ y
 
@@ -52,5 +52,4 @@ def solve(data):
 
 
 print("🎄 Day 22: Monkey Market")
-print("Part 1:", solve(parseData("task")))
-# print(f"Part 2:", solve(parseData("sample")))
+print("Part 2:", solve2(parseData("task")))
