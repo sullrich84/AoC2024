@@ -1,4 +1,3 @@
-from functools import cache
 from math import floor
 
 
@@ -7,13 +6,30 @@ def parseData(name="task"):
     return [int(line) for line in lines]
 
 
+def mix(x, y):
+    return x ^ y
+
+
+def prune(x):
+    return x % 16777216
+
+
+def solve1(data):
+    def sec_num(x):
+        for _ in range(2000):
+            x = prune(mix(x * 64, x))
+            x = prune(mix(floor(x / 32), x))
+            x = prune(mix(x * 2048, x))
+        return x
+
+    total = 0
+    for sn in data:
+        total += sec_num(sn)
+
+    return total
+
+
 def solve2(data):
-    def mix(x, y):
-        return x ^ y
-
-    def prune(x):
-        return x % 16777216
-
     def prices(x):
         ans = [x % 10]
         for _ in range(2000):
@@ -52,4 +68,5 @@ def solve2(data):
 
 
 print("🎄 Day 22: Monkey Market")
+print("Part 1:", solve1(parseData("task")))
 print("Part 2:", solve2(parseData("task")))
