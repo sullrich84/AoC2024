@@ -1,5 +1,4 @@
 from collections import defaultdict
-from functools import total_ordering
 
 
 def parseData(name="task"):
