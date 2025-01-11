@@ -1,0 +1,61 @@
+Swapping z05 -> z02 / z01 -> z03
+42 44 3
+Swapping z05 -> z03 / z02 -> z01
+42 44 33
+Swapping z05 -> z02 / z01 -> z04
+42 44 9
+Swapping z05 -> z04 / z02 -> z01
+42 44 9
+Swapping z05 -> z02 / z01 -> z00
+42 44 10
+Swapping z05 -> z00 / z02 -> z01
+42 44 40
+Swapping z05 -> z02 / z03 -> z04
+42 44 17
+Swapping z05 -> z04 / z02 -> z03
+42 44 5
+Swapping z05 -> z02 / z03 -> z00
+42 44 9
+Swapping z05 -> z00 / z02 -> z03
+42 44 36
+Swapping z05 -> z02 / z04 -> z00
+42 44 24
+Swapping z05 -> z00 / z02 -> z04
+42 44 40
+Swapping z05 -> z01 / z03 -> z04
+42 44 17
+Swapping z05 -> z04 / z01 -> z03
+42 44 3
+Swapping z05 -> z01 / z03 -> z00
+42 44 9
+Swapping z05 -> z00 / z01 -> z03
+42 44 34
+Swapping z05 -> z01 / z04 -> z00
+42 44 24
+Swapping z05 -> z00 / z01 -> z04
+42 44 40
+Swapping z05 -> z03 / z04 -> z00
+42 44 48
+Swapping z05 -> z00 / z03 -> z04
+42 44 48
+Swapping z02 -> z01 / z03 -> z04
+42 44 17
+Swapping z02 -> z04 / z01 -> z03
+42 44 3
+Swapping z02 -> z01 / z03 -> z00
+42 44 9
+Swapping z02 -> z00 / z01 -> z03
+42 44 6
+Swapping z02 -> z01 / z04 -> z00
+42 44 24
+Swapping z02 -> z00 / z01 -> z04
+42 44 12
+Swapping z02 -> z03 / z04 -> z00
+42 44 20
+Swapping z02 -> z00 / z03 -> z04
+42 44 20
+Swapping z01 -> z03 / z04 -> z00
+42 44 18
+Swapping z01 -> z00 / z03 -> z04
+42 44 18
+Part 2: 0

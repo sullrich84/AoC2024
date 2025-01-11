@@ -11,9 +11,8 @@ def parseData(name="task"):
         {v: tuple(k.split()) for k, v in connections},
     )
 
-def solve1(data):
-    inputs, connections = data
 
+def compute_state(inputs, connections):
     state = {}
     for wire, value in inputs:
         state[wire] = value
@@ -22,30 +21,7 @@ def solve1(data):
     while len(unresolved) > 0:
         wire, (w1, op, w2) = unresolved.popleft()
         if w1 not in state or w2 not in state:
-            unresolved.append(((w1, op, w2), wire))
-            continue
-        elif op == "AND":
-            state[wire] = state[w1] and state[w2]
-        elif op == "XOR":
-            state[wire] = state[w1] ^ state[w2]
-        elif op == "OR":
-            state[wire] = state[w1] or state[w2]
-
-    zk = reversed(sorted(list(filter(lambda k: k[0] == "z", state.keys()))))
-    binary = "".join([str(state[k]) for k in zk])
-    return int(binary, 2)
-
-
-def compute(inputs, connections):
-    state = {}
-    for wire, value in inputs:
-        state[wire] = value
-
-    unresolved = deque(connections.items())
-    while len(unresolved) > 0:
-        wire, (w1, op, w2) = unresolved.popleft()
-        if w1 not in state or w2 not in state:
-            unresolved.append(((w1, op, w2), wire))
+            unresolved.append((wire, (w1, op, w2)))
             continue
         elif op == "AND":
             state[wire] = state[w1] and state[w2]
@@ -58,31 +34,23 @@ def compute(inputs, connections):
 
 
 def get_binary(state, char):
-    raw = reversed(sorted(list(filter(lambda k: k[0] == char, state.keys()))))
-    return "".join([str(state[r]) for r in raw])
+    keys = reversed(sorted(list(filter(lambda k: k[0] == char, state.keys()))))
+    return "".join([str(state[k]) for k in keys])
+
+
+def solve1(data):
+    inputs, connections = data
+    state = compute_state(inputs, connections)
+    return int(get_binary(state, "z"), 2)
 
 
 def solve2(data):
-    inputs, connections = data
-    zKeys = list(filter(lambda c: c[0] == "z", [c[1] for c in connections]))
-    zKey_combo = list(combinations(zKeys, 4))
+    _, connections = data
 
-    for combo in zKey_combo:
-        pairs = list(combinations(combo, 2))
-        for k1, k2 in pairs:
-            swapped_conns = connections.copy()
-            print(k1, k2)
+    print(connections)
 
-        exit()
-        state = compute(inputs, connections)
-
-        x = get_binary(state, "x")
-        y = get_binary(state, "y")
-        z = get_binary(state, "z")
-        print("x", x, int(x, 2))
-        print("y", y, int(y, 2))
-        print("z", z, int(z, 2))
-
+    for row in connections.items():
+        print(*row)
     return 0
 
 
