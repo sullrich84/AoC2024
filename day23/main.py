@@ -52,5 +52,5 @@ def solve2(data):
 
 
 print("🎄 Day 23: LAN Party")
-# print("Part 1:", solve1(parseData("task")))
+print("Part 1:", solve1(parseData("task")))
 print("Part 2:", solve2(parseData("task")))
