@@ -1,78 +1,72 @@
-data1, data2 = open("task.txt").read().split("\n\n")
+from icecream import ic
 
-grid = [list(line) for line in data1.splitlines()]
-moves = data2.replace("\n", "")
-mVec = {"^": (-1, 0), ">": (0, 1), "v": (1, 0), "<": (0, -1)}
 
+vec = {"^": (-1, 0), ">": (0, 1), "v": (1, 0), "<": (0, -1)}
+grid, moves = open("sample.txt").read().split("\n\n")
+grid = [list(l) for l in grid.splitlines()]
+moves = [vec[m] for m in list(moves.replace("\n", ""))]
+
+walls = []
+boxes = []
+
+pr, pc = 0, 0
 rows = len(grid)
 cols = len(grid[0])
-pos, boxes, walls = (0, 0), [], []
 
 
-def print_grid():
+def lookup(r, c):
+    if (r, c) in boxes:
+        return "O"
+    elif (r, c) in walls:
+        return "#"
+    elif (r, c) == (pr, pc):
+        return "@"
+    return "."
+
+
+def draw():
     for r in range(rows):
         out = ""
         for c in range(cols):
-            p = (r, c)
-            if p == pos:
-                out += "@"
-            elif p in boxes:
-                out += "O"
-            elif p in walls:
-                out += "#"
-            else:
-                out += "."
+            out += lookup(r, c)
         print(out)
     print()
 
 
 for r in range(rows):
     for c in range(cols):
-        t = grid[r][c]
-        p = (r, c)
-        if t == "@":
-            pos = p
-        elif t == "#":
-            walls.append(p)
-        elif t == "O":
-            boxes.append(p)
+        pos = (r, c)
+        if grid[r][c] == "O":
+            boxes.append(pos)
+        elif grid[r][c] == "#":
+            walls.append(pos)
+        elif grid[r][c] == "@":
+            pr, pc = pos
 
-for m in moves:
-    dr, dc = mVec[m]
-    rr, rc = pos
-    nr, nc = (rr + dr, rc + dc)
-    nPos = (nr, nc)
 
-    if nPos in boxes:
-        # Check if box is movable
-        nBoxes = 1
-        tPos = nPos
-        movable = True
+for dr, dc in moves:
+    nr, nc = pr + dr, pc + dc
+    if lookup(nr, nc) == ".":
+        pr, pc = nr, nc
+    elif lookup(nr, nc) == "O":
+        mboxes = [(nr, nc)]
+        nnr, nnc = nr + dr, nc + dc
         while True:
-            tPos = (tPos[0] + dr, tPos[1] + dc)
-            if tPos in boxes:
-                nBoxes += 1
-                continue
-            elif tPos in walls:
-                movable = False
-            break
+            if lookup(nnr, nnc) == ".":
+                break
+            elif lookup(nnr, nnc) == "#":
+                mboxes.clear()
+                break
+            mboxes.append((nnr, nnc))
+            nnr, nnc = nnr + dr, nnc + dc
 
-        # print("dir:", m, "boxes:", nBoxes, "movable:", movable)
+        for br, bc in mboxes:
+            boxes.remove((br, bc))
+            boxes.append((br + dr, bc + dc))
 
-        if movable:
-            tPos = nPos
-            for i in range(0, nBoxes):
-                boxes.remove(tPos)
-                tPos = (tPos[0] + dr, tPos[1] + dc)
-                boxes.append(tPos)
-            pos = nPos
-    elif nPos not in walls:
-        pos = nPos
+        if mboxes != []:
+            pr, pc = nr, nc
 
-    # print_grid()
+draw()
 
-res = 0
-for r, c in boxes:
-    res += 100 * r + c
-
-print("Answer:", res)
+print("Part 1:", sum(list(map(lambda e: 100 * e[0] + e[1], boxes))))
