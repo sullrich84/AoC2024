@@ -43,6 +43,41 @@ def solve(data):
     return scores
 
 
+def solve2(data):
+    rows = len(data)
+    cols = len(data[0])
+
+    stack = []
+    heapify(stack)
+
+    for r in range(rows):
+        for c in range(cols):
+            if data[r][c] == 0:
+                heappush(stack, (0, r, c, r, c, []))
+
+    paths = defaultdict(list)
+
+    while stack:
+        height, r, c, sr, sc, path = heappop(stack)
+        path.append((r, c))
+
+        if height == 9:
+            paths[(sr, sc)].append(path)
+            continue
+
+        for nr, nc in [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]:
+            if nr not in range(rows) or nc not in range(cols):
+                continue
+            if data[nr][nc] == height + 1:
+                heappush(stack, (height + 1, nr, nc, sr, sc, path))
+
+    scores = 0
+    for root in paths:
+        scores += len(paths[root])
+
+    return scores
+
+
 print("🎄 Day 10: Hoof It")
 print("Part 1:", solve(parseData("task")))
-# print("Part 2:", solve(parseData("sample")))
+print("Part 2:", solve2(parseData("task")))
