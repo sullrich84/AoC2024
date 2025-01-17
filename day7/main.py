@@ -1,6 +1,5 @@
+from itertools import product
 from collections import deque
-from inspect import stack
-from typing import Deque
 from icecream import ic
 
 
@@ -32,6 +31,27 @@ def solve1(data):
     return solvable
 
 
-print("🎄 Day 0: XXX")
+def solve2(data):
+    solvable = 0
+
+    for row in data:
+        res, *nums = row
+        for combo in product("+*|", repeat=len(nums) - 1):
+            ans = nums[0]
+            for i in range(1, len(nums)):
+                if combo[i - 1] == "+":
+                    ans += nums[i]
+                elif combo[i - 1] == "*":
+                    ans *= nums[i]
+                elif combo[i - 1] == "|":
+                    ans = int(str(ans) + str(nums[i]))
+            if ans == res:
+                solvable += res
+                break
+
+    return solvable
+
+
+print("🎄 Day 7: Bridge Repair")
 print("Part 1:", solve1(parseData("task")))
-print("Part 2:", solve1(parseData("sample")))
+print("Part 2:", solve2(parseData("task")))
