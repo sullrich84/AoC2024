@@ -31,49 +31,45 @@ def solve1(data):
 
 
 def solve2(data):
-    id = 0
-    disk = []
+    files = {}
+    blanks = []
+
+    fid = 0
+    pos = 0
 
     for i, char in enumerate(data):
         if i % 2 == 0:
-            disk += [id] * char
-            id += 1
+            files[fid] = (pos, char)
+            fid += 1
         else:
-            disk += ["."] * char
+            if char != 0:
+                blanks.append((pos, char))
+        pos += char
 
-    def free_blocks(length):
-        count = 0
-        for i, c in enumerate(disk):
-            if c == ".":
-                count += 1
-                if count == length:
-                    return i - length + 1
-            else:
-                count = 0
+    while fid > 0:
+        fid -= 1
+        pos, size = files[fid]
+        for i, (start, length) in enumerate(blanks):
+            if start >= pos:
+                blanks = blanks[:i]
+                break
+            if size <= length:
+                files[fid] = (start, size)
+                if size == length:
+                    blanks.pop(i)
+                else:
+                    blanks[i] = (start + size, length - size)
+                break
 
-    # ic("".join(map(str, disk)), free_blocks(7))
+    total = 0
 
-    for c in range(9, 0, -1):
-        files = [i for i, f in enumerate(disk) if f == c]
-        length = len(files)
-        space = free_blocks(length)
+    for fid, (pos, size) in files.items():
+        for x in range(pos, pos + size):
+            total += fid * x
 
-        if not space or space >= files[0]:
-            continue
-
-        # ic("Move", c, length, "to index", space)
-        print("".join(map(str, disk)))
-
-        for i in range(space, space + length):
-            disk[i] = c
-        for i in files:
-            disk[i] = "."
-
-    ans = [i * c for i, c in enumerate(disk) if c != "."]
-    # assert sum(ans) != 15888670915219
-    return sum(ans)
+    return total
 
 
 print("🎄 Day 9: Disk Fragmenter")
-# print("Part 1:", solve1(parseData("sample")))
+print("Part 1:", solve1(parseData("sample")))
 print("Part 2:", solve2(parseData("sample")))
