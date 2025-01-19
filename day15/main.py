@@ -1,5 +1,4 @@
 from icecream import ic
-import os
 
 dirs = {
     "^": (-1, 0),
@@ -12,7 +11,7 @@ dirs = {
 def parseData(name="task"):
     grid, moves = open(f"{name}.txt").read().split("\n\n")
     grid = [list(c) for c in grid.splitlines()]
-    moves = list(map(lambda c: dirs[c], list(moves.splitlines()[0])))
+    moves = list(map(lambda c: dirs[c], list(moves.replace("\n", ""))))
     return grid, moves
 
 
@@ -65,7 +64,16 @@ def sum_coords(boxes):
     return ans
 
 
-def safe_guard(walls, boxes):
+def safe_guard(walls, boxes, pos):
+    if len(set(boxes)) != len(boxes):
+        raise Warning("Overlapping boxes")
+
+    if pos in boxes:
+        raise Warning("Robot overlapping with boxes")
+
+    if pos in walls:
+        raise Warning("Robot overlapping with walls")
+
     for b in boxes:
         if b in walls:
             raise Warning("Box in Wall")
@@ -77,32 +85,33 @@ def solve1(grid, moves):
     walls = find_all(grid, "#")
     pos = find(grid, "@")
 
-    for mvec in moves[:44]:
+    for mvec in moves:
         npos = add(pos, mvec)
-        safe_guard(walls, boxes)
+        # safe_guard(walls, boxes, pos)
 
         if not in_range(npos, rows, cols) or npos in walls:
             continue
         if npos in boxes:
             to_move = []
             search_pos = npos
+            # Scan for all adjacent boxes
             while in_range(search_pos, rows, cols) and search_pos in boxes:
                 to_move.append(search_pos)
                 search_pos = add(search_pos, mvec)
+            # Check if last box can be moved to empty field
             if add(to_move[-1], mvec) not in walls:
                 pos = npos
-                for m in to_move:
+                for m in reversed(to_move):
                     boxes.remove(m)
                     boxes.append(add(m, mvec))
         else:
             pos = npos
 
-    ic(mvec)
+    # ic(mvec)
     draw(grid, pos, walls, boxes)
-    # draw(grid, pos, walls, boxes)
     return sum_coords(boxes)
 
 
 print("🎄 Day 15: Warehouse Woes")
-print("Part 1:", solve1(*parseData("sample")))
+print("Part 1:", solve1(*parseData("task")))
 # print("Part 2:", solve(*parseData("sample")))
