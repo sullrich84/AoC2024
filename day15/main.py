@@ -1,140 +1,108 @@
 from icecream import ic
+import os
+
+dirs = {
+    "^": (-1, 0),
+    "v": (+1, 0),
+    ">": (0, +1),
+    "<": (0, -1),
+}
 
 
-vec = {"^": (-1, 0), ">": (0, 1), "v": (1, 0), "<": (0, -1)}
-grid, moves = open("test2.txt").read().split("\n\n")
-grid = [list(l) for l in grid.splitlines()]
-moves = [vec[m] for m in list(moves.replace("\n", ""))]
-
-for i, row in enumerate(grid):
-    nrow = ""
-    for e in row:
-        if e == ".":
-            nrow += ".."
-        elif e == "O":
-            nrow += "[]"
-        elif e == "#":
-            nrow += "##"
-        elif e == "@":
-            nrow += "@."
-    grid[i] = list(nrow)
-
-walls = []
-boxes = []
-
-pr, pc = 0, 0
-rows = len(grid)
-cols = len(grid[0])
+def parseData(name="task"):
+    grid, moves = open(f"{name}.txt").read().split("\n\n")
+    grid = [list(c) for c in grid.splitlines()]
+    moves = list(map(lambda c: dirs[c], list(moves.splitlines()[0])))
+    return grid, moves
 
 
-def lookup(r, c):
-    if (r, c) in boxes:
-        return "["
-    elif (r, c - 1) in boxes:
-        return "]"
-    elif (r, c) in walls:
-        return "#"
-    elif (r, c) == (pr, pc):
-        return "@"
-    return "."
+def find(grid, char):
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c] == char:
+                return (r, c)
+    return (-1, -1)
 
 
-def find_box(r, c):
-    if (r, c) in boxes:
-        return (r, c)
-    elif (r, c - 1) in boxes:
-        return (r, c - 1)
+def find_all(grid, char):
+    all = []
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c] == char:
+                all.append((r, c))
+    return all
 
 
-def draw():
-    for r in range(rows):
+def add(a, b):
+    return (a[0] + b[0], a[1] + b[1])
+
+
+def draw(grid, pos, walls, boxes):
+    for r in range(len(grid)):
         out = ""
-        for c in range(cols):
-            out += lookup(r, c)
+        for c in range(len(grid[0])):
+            if (r, c) == pos:
+                out += "@"
+            elif (r, c) in boxes:
+                out += "O"
+            elif (r, c) in walls:
+                out += "#"
+            else:
+                out += "."
         print(out)
     print()
 
 
-for r in range(rows):
-    for c in range(cols):
-        pos = (r, c)
-        if grid[r][c] == "[":
-            boxes.append((r, c))
-        elif grid[r][c] == "#":
-            walls.append(pos)
-        elif grid[r][c] == "@":
-            pr, pc = pos
+def in_range(pos, rows, cols):
+    r, c = pos
+    return r in range(rows) and c in range(cols)
 
 
-def safe_guard():
+def sum_coords(boxes):
+    ans = 0
     for r, c in boxes:
-        if (r, c + 1) in boxes:
-            raise AssertionError("Overlapping boxes", (r, c + 1))
-        if (r, c) in walls or (r, c + 1) in walls:
-            raise AssertionError("Box in wall")
+        ans += 100 * r + c
+    return ans
 
 
-for dr, dc in moves:
-    safe_guard()
-    draw()
+def safe_guard(walls, boxes):
+    for b in boxes:
+        if b in walls:
+            raise Warning("Box in Wall")
 
-    nr, nc = pr + dr, pc + dc
-    if lookup(nr, nc) == ".":
-        pr, pc = nr, nc
 
-    elif lookup(nr, nc) in ["[", "]"]:
-        # At this point we know we'll hit
-        # a box with the next move
-        mboxes = [find_box(nr, nc)]
+def solve1(grid, moves):
+    rows, cols = len(grid), len(grid[0])
+    boxes = find_all(grid, "O")
+    walls = find_all(grid, "#")
+    pos = find(grid, "@")
 
-        ndr = dr
-        ndc = 2 * dc if dr == 0 else dc
-        nnr, nnc = nr + ndr, nc + ndc
+    for mvec in moves[:44]:
+        npos = add(pos, mvec)
+        safe_guard(walls, boxes)
 
-        while True:
-            if lookup(nnr, nnc) == ".":
-                break
-            elif lookup(nnr, nnc) == "#":
-                mboxes.clear()
-                break
-            elif lookup(nnr, nnc) in ["[", "]"]:
-                # Also check left and right corner of
-                # closest box when moving vertically
-                if dc == 0:
-                    # WARN: This doesnt work, we need cs, ce per row! 
-                    rs = min(map(lambda b: b[0], mboxes))
-                    re = max(map(lambda b: b[0], mboxes))
+        if not in_range(npos, rows, cols) or npos in walls:
+            continue
+        if npos in boxes:
+            to_move = []
+            search_pos = npos
+            while in_range(search_pos, rows, cols) and search_pos in boxes:
+                to_move.append(search_pos)
+                search_pos = add(search_pos, mvec)
+            if add(to_move[-1], mvec) not in walls:
+                pos = npos
+                for m in to_move:
+                    boxes.remove(m)
+                    boxes.append(add(m, mvec))
+        else:
+            pos = npos
 
-                    cs = min(map(lambda b: b[1], mboxes))
-                    ce = max(map(lambda b: b[1], mboxes)) + 1
+    ic(mvec)
+    draw(grid, pos, walls, boxes)
+    # draw(grid, pos, walls, boxes)
+    return sum_coords(boxes)
 
-                    ic(rs, re, cs, ce)
-                    
-                    for nnr in range(rs, re + 1):
-                        for nnc in range(cs, ce + 1, 2):
-                            if lookup(nnr, nnc) in ["[", "]"]:
-                                nbox = find_box(nnr, nnc)
-                                mboxes.append(nbox)
-                                ic(cs, ce, nnc, nbox)
-                            elif lookup(nnr, nnc) == "#":
-                                ic("collision with wall")
-                                mboxes.clear()
-                                break
-                else:
-                    nbox = find_box(nnr, nnc)
-                    mboxes.append(nbox)
 
-            nnr, nnc = nnr + ndr, nnc + ndc
-            ic((pr, pc), mboxes, (nnr, nnc))
-
-        for br, bc in mboxes:
-            boxes.remove((br, bc))
-            boxes.append((br + dr, bc + dc))
-
-        if mboxes != []:
-            pr, pc = nr, nc
-
-safe_guard()
-draw()
-
-print("Part 1:", sum(list(map(lambda e: 100 * e[0] + e[1], boxes))))
+print("🎄 Day 15: Warehouse Woes")
+print("Part 1:", solve1(*parseData("sample")))
+# print("Part 2:", solve(*parseData("sample")))
